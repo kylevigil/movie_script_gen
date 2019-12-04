@@ -1,0 +1,29 @@
+<html>
+	<title>ScriptBot 3000</title>
+    <head>
+    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			// <![CDATA[
+	        function loading(){
+	        	console.log("pressed")
+	            $("#loading").show();
+	            $("#content").hide();       
+	        }
+			// ]]>
+		</script>
+    </head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <body>
+
+	    <div id="loading"></div>
+	    <div id="content">
+	        <h3>Generate Script:</h3>
+	        <p>
+	        <button type="button" onclick="loading();" formmethod="post">Click Me!</button>
+	        </p>
+	    </div>    
+	</body>
+
+
+</html>
