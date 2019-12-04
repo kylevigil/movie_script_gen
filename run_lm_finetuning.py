@@ -30,6 +30,7 @@ import random
 import re
 import shutil
 
+import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset, SequentialSampler, RandomSampler
@@ -76,16 +77,22 @@ class TextDataset(Dataset):
             logger.info("Creating features from dataset file at %s", directory)
 
             self.examples = []
-            with open(file_path, encoding="utf-8") as f:
-                text = f.read()
+            
+            df = pd.read_pickle("../data/train.pkl")
+            
+            genre_tok = dict()
+            for genre in df.genres.unique():
+                g = genre.replace(",", " ").replace("Sci-Fi", "Science Fiction") + "~"
+                genre_tok[genre] = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(g))
 
-            tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+            for script, genre in zip(df.script, df.genres):
+                tokenized_genre = genre_tok[genre]
+                tokenized_script = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(script))
 
-            for i in range(0, len(tokenized_text)-block_size+1, block_size): # Truncate in block of block_size
-                self.examples.append(tokenizer.build_inputs_with_special_tokens(tokenized_text[i:i+block_size]))
-            # Note that we are loosing the last truncated example here for the sake of simplicity (no padding)
-            # If your dataset is small, first you should loook for a bigger one :-) and second you
-            # can change this behavior by adding (model specific) padding.
+                temp_block_size = block_size - len(tokenized_genre)
+
+                for i in range(0, len(tokenized_script)-temp_block_size+1, temp_block_size):
+                    self.examples.append(tokenized_genre+tokenized_script[i:i+temp_block_size])
 
             logger.info("Saving features into cached file %s", cached_features_file)
             with open(cached_features_file, 'wb') as handle:
