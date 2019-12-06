@@ -65,7 +65,7 @@ MODEL_CLASSES = {
 
 class TextDataset(Dataset):
     def __init__(self, tokenizer, args, file_path='train', block_size=512):
-        assert os.path.isfile(file_path)
+        #assert os.path.isfile(file_path)
         directory, filename = os.path.split(file_path)
         cached_features_file = os.path.join(directory, args.model_name_or_path + '_cached_lm_' + str(block_size) + '_' + filename)
 
@@ -78,7 +78,7 @@ class TextDataset(Dataset):
 
             self.examples = []
             
-            df = pd.read_pickle("../data/train.pkl")
+            df = pd.read_pickle(file_path)
             
             genre_tok = dict()
             for genre in df.genres.unique():
